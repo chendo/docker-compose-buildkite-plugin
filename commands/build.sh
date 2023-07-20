@@ -191,7 +191,7 @@ while read -r arg ; do
 done <<< "$(plugin_read_list ARGS)"
 
 echo "+++ :docker: Building services ${services[*]}"
-run_docker_compose -f "$override_file" "${build_params[@]}" "${services[@]}"
+run_docker_compose -f "$override_file" "${build_params[@]}" "${services[@]}" | awk '/^#[0-9]/ {split($1,a,"#"); if (!seen[a[2]]++) print "--- " $0; else print $0; next} {print}'
 
 if [[ -n "$image_repository" ]] ; then
   echo "~~~ :docker: Pushing built images to $image_repository"
