@@ -456,8 +456,19 @@ fi
 
 # Execute post run script
 if [[ -n "$(plugin_read_config POST_RUN_SCRIPT)" ]] ; then
-  echo "--- Running post run script"
+  echo "--- Running post-run script"
+  set +e
   (eval $(plugin_read_config POST_RUN_SCRIPT))
+  postrun_exitcode=$?
+  set -e
+
+  if [[ $postrun_exitcode = "TRAP" ]]; then
+    # command failed due to cancellation signal, make sure there is an error but no further output
+    exitcode=-1
+  elif [[ $postrun_exitcode -ne 0 ]] ; then
+    echo "^^^ +++"
+    echo "+++ :warning: Failed to execute post-run script, exited with $postrun_exitcode"
+  fi
 fi
 
 return "$exitcode"
