@@ -454,4 +454,10 @@ if [[ -n "${BUILDKITE_AGENT_ACCESS_TOKEN:-}" ]] ; then
   fi
 fi
 
+# Execute post run script
+if [[ -n "$(plugin_read_config POST_RUN_SCRIPT)" ]] ; then
+  echo "--- Running post run script"
+  (eval $(plugin_read_config POST_RUN_SCRIPT))
+fi
+
 return "$exitcode"
